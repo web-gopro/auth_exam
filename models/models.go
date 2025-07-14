@@ -1,0 +1,102 @@
+package models
+
+import "time"
+
+// User — oddiy foydalanuvchi (client)
+type User struct {
+	ID        string    `json:"id"`
+	Status    string    `json:"status"`               // "active", "deleted"
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"-"`                    // Parol JSON response’da ko‘rinmaydi
+	CreatedAt time.Time `json:"created_at"`
+	CreatedBy *string   `json:"created_by,omitempty"` // Sysuser ID (admin tomonidan yaratilgan bo‘lsa)
+}
+
+// UserLogin — foydalanuvchi login uchun
+type UserLogin struct {
+	User_name     string `json:"user_name"`
+	User_password string `json:"user_password"`
+}
+
+// SysUser — admin panel foydalanuvchisi
+type SysUser struct {
+	ID        string    `json:"id"`
+	Status    string    `json:"status"`               // "active", "deleted"
+	Name      string    `json:"name"`
+	Password  string    `json:"-"`
+	CreatedAt time.Time `json:"created_at"`
+	CreatedBy *string   `json:"created_by,omitempty"`
+}
+
+// Role — tizimdagi rollar
+type Role struct {
+	ID        string    `json:"id"`
+	Status    string    `json:"status"`               // "active", "deleted"
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+	CreatedBy *string   `json:"created_by,omitempty"`
+}
+
+// SysUserRole — sysuser va role orasidagi bog‘lovchi jadval
+type SysUserRole struct {
+	ID        string `json:"id"`
+	SysUserID string `json:"sysuser_id"`
+	RoleID    string `json:"role_id"`
+}
+
+// Claims — JWT token ma'lumotlari
+type Claims struct {
+	User_id   string `json:"user_id"`
+	User_role string `json:"user_role"`
+}
+
+// OtpData — OTP yuborish uchun
+type OtpData struct {
+	Otp   string `json:"otp"`
+	Email string `json:"email"`
+}
+
+// CheckOtpResp — OTP tekshiruvi javobi
+type CheckOtpResp struct {
+	Is_right string `json:"is_right"`
+}
+
+// AuthResp — login/verify javobi
+type AuthResp struct {
+	Access_token string `json:"access_token"`
+}
+
+// CheckExists — mavjudlikni tekshirish
+type CheckExists struct {
+	Status    string `json:"status"`
+	Is_exists bool   `json:"is_exists"`
+}
+
+// GetById — ID orqali ma’lumot olish
+type GetById struct {
+	Id string `json:"id"`
+}
+
+// Common — umumiy mavjudlik tekshiruvi
+type Common struct {
+	Table_name  string `json:"table_name"`
+	Column_name string `json:"column_name"`
+	Expvalue    string `json:"expvalue"`
+}
+
+// CommonResp — umumiy mavjudlik javobi
+type CommonResp struct {
+	IsExists bool `json:"is_exists"`
+}
+
+// UserCreateResp — foydalanuvchi yaratish javobi
+type UserCreateResp struct {
+	Status string `json:"status"`
+}
+
+type Check_User struct{
+
+
+	Email string `json:"email"`
+}
