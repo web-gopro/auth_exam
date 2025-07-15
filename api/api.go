@@ -25,9 +25,16 @@ func Api(o Options) *gin.Engine {
 
 	fmt.Println(h)
 
-	us.POST("/user", h.UserCreate)
+	// us.POST("/user", h.UserCreate)
 	us.GET("/user/:id", h.GetUserById)
 	us.POST("/check", h.CheckUser)
+	us.POST("/login", h.Login)
+	us.POST("/sinup", h.SignUp)
+
+
+	super:=api.Group("/super")
+
+	super.POST("/create",h.SysUserCreate)
 
 	// us.Use(middlewares.AuthMiddlewareUser())
 	// {

@@ -2,14 +2,17 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/web-gopro/auth_exam/models"
+	"github.com/web-gopro/auth_exam/pkg/helpers"
 )
 
 type UserRepo struct {
-	db  *pgx.Conn
+	db *pgx.Conn
 }
 
 func NewUserRepo(db *pgx.Conn) UserRepoI {
@@ -17,24 +20,27 @@ func NewUserRepo(db *pgx.Conn) UserRepoI {
 	return &UserRepo{db: db}
 }
 
-func (u *UserRepo) CreateUser(ctx context.Context, req models.User) (*models.UserCreateResp, error) {
+func (u *UserRepo) CreateUser(ctx context.Context, req models.UserCreReq) (*models.UserCreateResp, error) {
 
+	id := uuid.New()
 	query := `
 		INSERT INTO
 			users (
+				id,
 				status,
 				name,
 				email,
 				password,
 				created_by
 			)VALUES(
-				$1,$2,$3,$4,$5
+				$1,$2,$3,$4,$5,$6
 			)
 			`
 
 	_, err := u.db.Exec(
 		ctx,
 		query,
+		id,
 		req.Status,
 		req.Name,
 		req.Email,
@@ -43,11 +49,11 @@ func (u *UserRepo) CreateUser(ctx context.Context, req models.User) (*models.Use
 	)
 	if err != nil {
 
-		fmt.Println("err on db CreateUser",err.Error())
+		fmt.Println("err on db CreateUser", err.Error())
 		return nil, err
 	}
 
-	return &models.UserCreateResp{Status: "successfully inserted "}, nil
+	return &models.UserCreateResp{Status: req.Status, Id: id.String()}, nil
 
 }
 
@@ -107,36 +113,46 @@ func (u *UserRepo) IsExists(ctx context.Context, req models.Common) (*models.Com
 
 	return &models.CommonResp{IsExists: isExists}, nil
 
-
 }
 
 func (u *UserRepo) UserLogin(ctx context.Context, req models.UserLogin) (*models.Claims, error) {
 
-	// var viwerId, gmail, hashPassword, userRole string
+	var userId, hashPassword, userRole string
 
-	// query := `
-	// 	SELECT
-	// 		user_id,
-	// 		email,
-	// 		password,
-	// 		user_role
-	// 	FROM
-	// 		users
-	// 	WHERE
-	// 		username =$1
-	// `
+	query := `
+		SELECT		
+				id,	
+				status,
+				password
+				
+								
+		FROM
+			users
+		WHERE
+			email =$1
+	`
 
-	// err := u.db.QueryRow(ctx, query, req.Username).Scan(&viwerId, &gmail, &hashPassword, &userRole)
+	err := u.db.QueryRow(
+		ctx,
+		query,
+		req.Email,
+	).Scan(
+		&userId,
+		&userRole,
+		&hashPassword,
+	)
 
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if err != nil {
 
-	// if !helpers.CompareHashPassword(hashPassword, req.Password) {
-	// 	return nil, errors.New("password is incorrect")
-	// }
+		fmt.Println("err on user login db ", err.Error())
+		return nil, err
+	}
 
-	// return &book_shop.Clamis{UserId: viwerId, UserRole: userRole}, nil
+	if !helpers.CompareHashPassword(hashPassword, req.User_password) {
+		fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+		return nil, errors.New("password is incorrect")
+	}
 
-	return nil, nil
+	return &models.Claims{User_id: userId, User_role: userRole}, nil
+
 }
