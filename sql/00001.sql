@@ -13,6 +13,7 @@ CREATE TABLE users (
 CREATE TABLE sysusers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     status VARCHAR(50) NOT NULL, -- [active, deleted]
+    email VARCHAR(255) UNIQUE,
     name VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

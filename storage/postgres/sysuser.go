@@ -2,11 +2,13 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/web-gopro/auth_exam/models"
+	"github.com/web-gopro/auth_exam/pkg/helpers"
 )
 
 type SysUserRepo struct {
@@ -29,11 +31,12 @@ func (p *SysUserRepo) CreateSysUser(ctx context.Context, req models.SysUserCretR
 			sysusers (
 				id,
 				status,
+				email,
 				name,
 				password,
 				created_by
 			)VALUES(
-				$1,$2,$3,$4,$5
+				$1,$2,$3,$4,$5,$6
 			)
 			`
 
@@ -42,6 +45,7 @@ func (p *SysUserRepo) CreateSysUser(ctx context.Context, req models.SysUserCretR
 		query,
 		id,
 		req.Status,
+		req.Email,
 		req.Name,
 		req.Password,
 		req.CreatedBy,
@@ -93,11 +97,90 @@ func (p *SysUserRepo) CreateSysUser(ctx context.Context, req models.SysUserCretR
 
 	return &models.SysUserCreateResp{Id: id.String(), Role: req.Role}, nil
 }
-func (p *SysUserRepo) GetSysUserById(ctx context.Context, req models.GetById) (*models.SysUser, error) {
+func (p *SysUserRepo) GetSysUser(ctx context.Context, req models.GetById) (*models.SysUserCretReq, error) {
 
-	return nil, nil
+	resp := models.SysUserCretReq{}
+	query := `
+		SELECT
+   			su.id,
+   			su.name,
+    		su.email,
+   			su.status,
+   			su.created_at,
+  			su.created_by,
+    		r.name AS role_name
+		FROM
+    		sysusers su
+		LEFT JOIN
+   			sysuser_roles sr ON su.id = sr.sysuser_id
+		LEFT JOIN
+   			roles r ON sr.role_id = r.id
+		WHERE
+   			 su.id = $1
+   		AND su.status = 'active'
+    	AND (r.status = 'active' OR r.status IS NULL);
+	`
+
+	err:=p.db.QueryRow(
+		ctx, query,
+		req.Id,
+	).Scan(
+		&resp.ID,
+		&resp.Name,
+		&resp.Email,
+		&resp.Status,
+		&resp.CreatedAt,
+		&resp.CreatedBy,
+		&resp.Role,
+	)
+
+		if err != nil {
+
+		fmt.Println("err on db get sysuser ", err.Error())
+		return nil, err
+	}
+	return &resp, nil
 }
-func (p *SysUserRepo) SysUserLogin(ctx context.Context, req models.UserLogin) (*models.Claims, error) {
+func (p *SysUserRepo) SysUserLogin(ctx context.Context, req models.LoginReq) (*models.Claims, error) {
 
-	return nil, nil
+	var hashPassword string
+	var resp models.Claims
+	query := `
+		SELECT
+			su.id,
+			su.password,
+   		 	r.name AS role_name
+		FROM
+    		sysusers su
+		JOIN
+   			 sysuser_roles sr ON su.id = sr.sysuser_id
+		JOIN
+    		roles r ON sr.role_id = r.id
+		WHERE
+    	LOWER(su.email) = LOWER($1)
+   		AND su.status = 'active'
+    	AND r.status = 'active';
+`
+
+	err := p.db.QueryRow(
+		ctx,
+		query,
+		req.Email,
+	).Scan(
+		&resp.User_id,
+		&hashPassword,
+		&resp.User_role,
+	)
+
+	if err != nil {
+
+		fmt.Println("err on db sysuser login ", err.Error())
+		return nil, err
+	}
+
+	if !helpers.CompareHashPassword(hashPassword, req.User_password) {
+		return nil, errors.New("password is incorrect")
+	}
+
+	return &resp, nil
 }

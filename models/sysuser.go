@@ -15,6 +15,7 @@ type SysUser struct {
 type SysUserCretReq struct {
 	ID        string    `json:"id"`
 	Status    string    `json:"status"` // "active", "deleted"
+	Email     string    `json:"email"`
 	Name      string    `json:"name"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"created_at"`
@@ -40,6 +41,6 @@ type SysUserRole struct {
 
 // UserCreateResp — foydalanuvchi yaratish javobi
 type SysUserCreateResp struct {
-	Id     string `json:"id"`
+	Id   string `json:"id"`
 	Role string `json:"role"`
 }

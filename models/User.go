@@ -25,10 +25,7 @@ type UserCreReq struct {
 }
 
 // UserLogin — foydalanuvchi login uchun
-type UserLogin struct {
-	Email         string `json:"email"`
-	User_password string `json:"password"`
-}
+
 
 
 // UserCreateResp — foydalanuvchi yaratish javobi

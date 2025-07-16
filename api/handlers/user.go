@@ -124,7 +124,6 @@ func (h *Handler) SignUp(ctx *gin.Context) {
 	err := ctx.BindJSON(&reqBody)
 
 	if err != nil {
-		fmt.Println("errrr on ShouldBindJSON", logger.Error(err))
 		ctx.JSON(500, err.Error())
 		return
 	}
@@ -178,7 +177,7 @@ func (h *Handler) SignUp(ctx *gin.Context) {
 
 func (h *Handler) Login(ctx *gin.Context) {
 
-	var reqBody models.UserLogin
+	var reqBody models.LoginReq
 
 	err := ctx.BindJSON(&reqBody)
 

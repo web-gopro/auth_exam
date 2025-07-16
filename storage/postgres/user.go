@@ -115,17 +115,15 @@ func (u *UserRepo) IsExists(ctx context.Context, req models.Common) (*models.Com
 
 }
 
-func (u *UserRepo) UserLogin(ctx context.Context, req models.UserLogin) (*models.Claims, error) {
+func (u *UserRepo) UserLogin(ctx context.Context, req models.LoginReq) (*models.Claims, error) {
 
 	var userId, hashPassword, userRole string
 
 	query := `
 		SELECT		
-				id,	
-				status,
-				password
-				
-								
+			id,	
+			status,
+			password
 		FROM
 			users
 		WHERE

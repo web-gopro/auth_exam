@@ -50,3 +50,9 @@ type CommonResp struct {
 type Check_User struct {
 	Email string `json:"email"`
 }
+
+
+type LoginReq struct {
+	Email         string `json:"email"`
+	User_password string `json:"password"`
+}
