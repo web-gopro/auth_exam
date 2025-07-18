@@ -48,6 +48,10 @@ func Api(o Options) *gin.Engine {
 	super.Use(middlewares.AuthMiddlewareSuperAdmin())
 	super.GET("/sysuser", h.GetSysUser)
 	super.POST("/sysuser_create", h.SysUserCreate)
+	super.POST("/role", h.RoleCreate)
+	super.PUT("/role", h.RoleCreate)
+	super.GET("/role/:id", h.RoleGetById)
+
 
 	url := ginSwagger.URL("swagger/doc.json")
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, url))

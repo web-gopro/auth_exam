@@ -11,11 +11,40 @@ definitions:
       status:
         type: string
     type: object
+  models.CreateRoleRequest:
+    properties:
+      name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      status:
+        enum:
+        - active
+        - deleted
+        type: string
+    required:
+    - name
+    - status
+    type: object
   models.LoginReq:
     properties:
       email:
         type: string
       password:
+        type: string
+    type: object
+  models.Role:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        description: '"active", "deleted"'
         type: string
     type: object
   models.SysUser:
@@ -54,6 +83,20 @@ definitions:
         type: string
       status:
         description: '"active", "deleted"'
+        type: string
+    type: object
+  models.UpdateRoleRequest:
+    properties:
+      id:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 3
+        type: string
+      status:
+        enum:
+        - active
+        - deleted
         type: string
     type: object
   models.User:
@@ -240,6 +283,112 @@ paths:
       summary: Get user by ID
       tags:
       - all
+  /api/super/role:
+    post:
+      consumes:
+      - application/json
+      description: Create a new role user (admin, buxgalter, etc.) with role assignment
+      parameters:
+      - description: Role object to create
+        in: body
+        name: sysuser
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "409":
+          description: Role already exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create a new Role
+      tags:
+      - role
+    put:
+      consumes:
+      - application/json
+      description: Update system user role (admin, buxgalter, etc.) with role assignment
+      parameters:
+      - description: SysUser object to create
+        in: body
+        name: sysuser
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully Updated
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "409":
+          description: SysUser already exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update Role
+      tags:
+      - role
+  /api/super/role/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get system role details by ID
+      parameters:
+      - description: Role ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully Retrieved
+          schema:
+            $ref: '#/definitions/models.Role'
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "404":
+          description: Role not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get Role by ID
+      tags:
+      - role
   /api/super/sysuser:
     get:
       consumes:

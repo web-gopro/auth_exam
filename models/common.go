@@ -45,14 +45,16 @@ type CommonResp struct {
 	IsExists bool `json:"is_exists"`
 }
 
-
-
 type Check_User struct {
 	Email string `json:"email"`
 }
 
-
 type LoginReq struct {
 	Email         string `json:"email"`
 	User_password string `json:"password"`
+}
+
+type GetList struct {
+	Limit int `json:"limit"`
+	Page  int `json:"page"`
 }

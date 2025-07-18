@@ -58,7 +58,7 @@ func (u *UserRepo) CreateUser(ctx context.Context, req models.UserCreReq) (*mode
 func (u *UserRepo) GetUserById(ctx context.Context, req models.GetById) (*models.User, error) {
 
 	var resp models.User
-	qury := `
+	query := `
 		SELECT 
 				id,
 				status,
@@ -75,7 +75,7 @@ func (u *UserRepo) GetUserById(ctx context.Context, req models.GetById) (*models
 
 	err := u.db.QueryRow(
 		ctx,
-		qury,
+		query,
 		req.Id,
 	).Scan(
 		&resp.ID,
