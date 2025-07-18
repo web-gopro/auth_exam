@@ -68,8 +68,8 @@ func Load() Config {
  config.GeneralConfig.SignInKey = cast.ToString(getOrReturnDefaultValue("SIGN_IN_KEY", "ASJDKLFJASasdFASE2SD2dafa"))
 
  // postgres config
- config.PgConfig.Username = cast.ToString(getOrReturnDefaultValue("POSTGRES_USER", "jasur"))
- config.PgConfig.Password = cast.ToString(getOrReturnDefaultValue("POSTGRES_PASSWORD", "2005"))
+ config.PgConfig.Username = cast.ToString(getOrReturnDefaultValue("POSTGRES_USER", ""))
+ config.PgConfig.Password = cast.ToString(getOrReturnDefaultValue("POSTGRES_PASSWORD", ""))
  config.PgConfig.Host = cast.ToString(getOrReturnDefaultValue("POSTGRES_HOST", "localhost"))
  config.PgConfig.Port = cast.ToInt(getOrReturnDefaultValue("POSTGRES_PORT", 5432))
  config.PgConfig.DatabaseName = cast.ToString(getOrReturnDefaultValue("POSTGRES_DATABASE", config.GeneralConfig.AppName))
