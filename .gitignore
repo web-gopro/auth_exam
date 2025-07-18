@@ -1,0 +1,12 @@
+.env
+.env.*
+
+.vscode/
+.idea/
+
+*.log
+
+*.local
+*.secret
+*.bak
+*.tmp
