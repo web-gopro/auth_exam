@@ -9,7 +9,19 @@ import (
 	"github.com/web-gopro/auth_exam/token"
 )
 
-func (h *Handler) SysUserSinUp(ctx *gin.Context) {
+// @Summary Create a new sysuser
+// @Router /api/super/sysuser_create [post]
+// @Description Create a new system user (admin, buxgalter, etc.) with role assignment
+// @Tags sysusers
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param sysuser body models.SysUserCretReq true "SysUser object to create"
+// @Success 201 {object} models.SysUserCreateResp "Successfully created"
+// @Failure 400 {string} string "Invalid input"
+// @Failure 409 {string} string "SysUser already exists"
+// @Failure 500 {string} string "Internal server error"
+func (h *Handler) SysUserCreate(ctx *gin.Context) {
 
 	var reqBody models.SysUserCretReq
 
@@ -24,7 +36,7 @@ func (h *Handler) SysUserSinUp(ctx *gin.Context) {
 
 	tokenClaim, err := token.ParseJWT(tokenString)
 
-	reqBody.CreatedBy = &tokenClaim.UserId
+	createdBy:= &tokenClaim.UserId
 
 	if err != nil {
 		ctx.JSON(500, err.Error())
@@ -38,7 +50,7 @@ func (h *Handler) SysUserSinUp(ctx *gin.Context) {
 		return
 	}
 
-	resp, err := h.storage.SysUserRepo().CreateSysUser(context.Background(), reqBody)
+	resp, err := h.storage.SysUserRepo().CreateSysUser(context.Background(), reqBody,*createdBy)
 
 	if err != nil {
 		ctx.JSON(500, err.Error())
@@ -49,6 +61,18 @@ func (h *Handler) SysUserSinUp(ctx *gin.Context) {
 
 }
 
+
+
+// @Summary Login a sysuser
+// @Router /api/admp/login [post]
+// @Description login a system user
+// @Tags admp
+// @Accept json
+// @Produce json
+// @Param sysuser body models.LoginReq true "SysUser object to Login"
+// @Success 201 {string} string "Successfully LogedIn"
+// @Failure 400 {string} string "Invalid input"
+// @Failure 500 {string} string "Internal server error"
 func (h *Handler) SysUserLogin(ctx *gin.Context) {
 
 	var reqBody models.LoginReq
@@ -72,6 +96,16 @@ func (h *Handler) SysUserLogin(ctx *gin.Context) {
 
 }
 
+
+// GetSysUser godoc
+// @Summary Get all system users
+// @Description Only accessible by superadmin
+// @Tags sysusers
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SysUser
+// @Router /api/super/sysuser [get]
 func (h *Handler) GetSysUser(ctx *gin.Context) {
 
 	tokenString := ctx.GetHeader("Authorization")

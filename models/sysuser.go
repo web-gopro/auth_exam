@@ -13,6 +13,15 @@ type SysUser struct {
 }
 
 type SysUserCretReq struct {
+	Status    string    `json:"status"` // "active", "deleted"
+	Email     string    `json:"email"`
+	Name      string    `json:"name"`
+	Password  string    `json:"password"`
+	// CreatedBy *string   `json:"created_by,omitempty"`
+	Role      string    `json:"role"`
+}
+
+type SysUserGetResp struct {
 	ID        string    `json:"id"`
 	Status    string    `json:"status"` // "active", "deleted"
 	Email     string    `json:"email"`
@@ -22,7 +31,6 @@ type SysUserCretReq struct {
 	CreatedBy *string   `json:"created_by,omitempty"`
 	Role      string    `json:"role"`
 }
-
 // Role — tizimdagi rollar
 type Role struct {
 	ID        string    `json:"id"`

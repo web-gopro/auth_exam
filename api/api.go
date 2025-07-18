@@ -1,9 +1,16 @@
 package api
 
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/web-gopro/auth_exam/api/docs"
 	"github.com/web-gopro/auth_exam/api/handlers"
 	"github.com/web-gopro/auth_exam/api/middlewares"
 	"github.com/web-gopro/auth_exam/redis"
@@ -39,9 +46,11 @@ func Api(o Options) *gin.Engine {
 
 	super := api.Group("/super")
 	super.Use(middlewares.AuthMiddlewareSuperAdmin())
-	super.POST("/singup", h.SysUserSinUp)
 	super.GET("/sysuser", h.GetSysUser)
+	super.POST("/sysuser_create", h.SysUserCreate)
 
+	url := ginSwagger.URL("swagger/doc.json")
+	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, url))
 
 	return engine
 

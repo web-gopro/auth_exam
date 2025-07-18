@@ -22,7 +22,7 @@ func NewSysUserRepo(db *pgx.Conn) SysUserRepoI {
 	}
 }
 
-func (p *SysUserRepo) CreateSysUser(ctx context.Context, req models.SysUserCretReq) (*models.SysUserCreateResp, error) {
+func (p *SysUserRepo) CreateSysUser(ctx context.Context, req models.SysUserCretReq, createdBy string) (*models.SysUserCreateResp, error) {
 
 	id := uuid.New()
 	var roleId string
@@ -48,7 +48,7 @@ func (p *SysUserRepo) CreateSysUser(ctx context.Context, req models.SysUserCretR
 		req.Email,
 		req.Name,
 		req.Password,
-		req.CreatedBy,
+		createdBy,
 	)
 
 	if err != nil {
@@ -97,9 +97,9 @@ func (p *SysUserRepo) CreateSysUser(ctx context.Context, req models.SysUserCretR
 
 	return &models.SysUserCreateResp{Id: id.String(), Role: req.Role}, nil
 }
-func (p *SysUserRepo) GetSysUser(ctx context.Context, req models.GetById) (*models.SysUserCretReq, error) {
+func (p *SysUserRepo) GetSysUser(ctx context.Context, req models.GetById) (*models.SysUserGetResp, error) {
 
-	resp := models.SysUserCretReq{}
+	resp := models.SysUserGetResp{}
 	query := `
 		SELECT
    			su.id,
@@ -121,7 +121,7 @@ func (p *SysUserRepo) GetSysUser(ctx context.Context, req models.GetById) (*mode
     	AND (r.status = 'active' OR r.status IS NULL);
 	`
 
-	err:=p.db.QueryRow(
+	err := p.db.QueryRow(
 		ctx, query,
 		req.Id,
 	).Scan(
@@ -134,7 +134,7 @@ func (p *SysUserRepo) GetSysUser(ctx context.Context, req models.GetById) (*mode
 		&resp.Role,
 	)
 
-		if err != nil {
+	if err != nil {
 
 		fmt.Println("err on db get sysuser ", err.Error())
 		return nil, err

@@ -13,23 +13,16 @@ import (
 	"github.com/web-gopro/auth_exam/token"
 )
 
-func (h *Handler) UserCreate(ctx *gin.Context) {
-
-	var req models.UserCreReq
-
-	ctx.BindJSON(&req)
-
-	resp, err := h.storage.UserRepo().CreateUser(context.Background(), req)
-
-	if err != nil {
-
-		ctx.JSON(500, err.Error())
-	}
-
-	ctx.JSON(201, resp)
-
-}
-
+// GetUserById godoc
+// @Summary      Get user by ID
+// @Description  Fetch a user using their ID
+// @Tags         all
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "User ID"
+// @Success      201  {object}  models.User
+// @Failure      500  {string}  string
+// @Router       /api/all/user/{id} [get]
 func (h *Handler) GetUserById(ctx *gin.Context) {
 
 	var req models.GetById
@@ -47,6 +40,17 @@ func (h *Handler) GetUserById(ctx *gin.Context) {
 
 }
 
+// CheckUser godoc
+// @Summary      Check if user exists
+// @Description  Checks if the user email is already registered and sends OTP if not
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        user  body      models.Check_User  true  "Email to check"
+// @Success      201   {object}  models.CheckExists
+// @Failure      400   {string}  string
+// @Failure      500   {string}  string
+// @Router       /api/all/check [post]
 func (h *Handler) CheckUser(ctx *gin.Context) {
 
 	var reqBody models.Check_User
@@ -115,6 +119,17 @@ func (h *Handler) CheckUser(ctx *gin.Context) {
 
 }
 
+// SignUp godoc
+// @Summary      Sign up a new user
+// @Description  Completes registration using OTP
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        user  body      models.UserCreReq  true  "User signup data with OTP"
+// @Success      201   {string}  string
+// @Failure      405   {string}  string
+// @Failure      500   {string}  string
+// @Router       /api/all/singup [post]
 func (h *Handler) SignUp(ctx *gin.Context) {
 
 	var otpData models.OtpData
@@ -175,6 +190,17 @@ func (h *Handler) SignUp(ctx *gin.Context) {
 
 }
 
+// Login godoc
+// @Summary      User login
+// @Description  Logs in a user with email and password
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        credentials  body      models.LoginReq  true  "User login credentials"
+// @Success      201          {string}  string
+// @Failure      405          {string}  string
+// @Failure      500          {string}  string
+// @Router       /api/all/login [post]
 func (h *Handler) Login(ctx *gin.Context) {
 
 	var reqBody models.LoginReq

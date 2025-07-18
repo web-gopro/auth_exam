@@ -16,8 +16,8 @@ type UserRepoI interface {
 
 type SysUserRepoI interface{
 
-	CreateSysUser(ctx context.Context, req models.SysUserCretReq) (*models.SysUserCreateResp, error)
-	GetSysUser(ctx context.Context, req models.GetById) (*models.SysUserCretReq, error)
+	CreateSysUser(ctx context.Context, req models.SysUserCretReq,createdBy string) (*models.SysUserCreateResp, error)
+	GetSysUser(ctx context.Context, req models.GetById) (*models.SysUserGetResp, error)
 	SysUserLogin(ctx context.Context, req models.LoginReq) (*models.Claims, error)
 
 }

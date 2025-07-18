@@ -30,10 +30,9 @@ func (u *UserRepo) CreateUser(ctx context.Context, req models.UserCreReq) (*mode
 				status,
 				name,
 				email,
-				password,
-				created_by
+				password
 			)VALUES(
-				$1,$2,$3,$4,$5,$6
+				$1,$2,$3,$4,$5
 			)
 			`
 
@@ -45,7 +44,6 @@ func (u *UserRepo) CreateUser(ctx context.Context, req models.UserCreReq) (*mode
 		req.Name,
 		req.Email,
 		req.Password,
-		req.CreatedBy,
 	)
 	if err != nil {
 
@@ -147,7 +145,6 @@ func (u *UserRepo) UserLogin(ctx context.Context, req models.LoginReq) (*models.
 	}
 
 	if !helpers.CompareHashPassword(hashPassword, req.User_password) {
-		fmt.Println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 		return nil, errors.New("password is incorrect")
 	}
 

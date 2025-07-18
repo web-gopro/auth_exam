@@ -1,0 +1,301 @@
+definitions:
+  models.Check_User:
+    properties:
+      email:
+        type: string
+    type: object
+  models.CheckExists:
+    properties:
+      is_exists:
+        type: boolean
+      status:
+        type: string
+    type: object
+  models.LoginReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.SysUser:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      status:
+        description: '"active", "deleted"'
+        type: string
+    type: object
+  models.SysUserCreateResp:
+    properties:
+      id:
+        type: string
+      role:
+        type: string
+    type: object
+  models.SysUserCretReq:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        description: CreatedBy *string   `json:"created_by,omitempty"`
+        type: string
+      status:
+        description: '"active", "deleted"'
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        description: Sysuser ID (admin tomonidan yaratilgan bo‘lsa)
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        description: Parol JSON response’da ko‘rinmaydi
+        type: string
+      status:
+        description: '"active", "deleted"'
+        type: string
+    type: object
+  models.UserCreReq:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      otp:
+        type: string
+      password:
+        description: Parol JSON response’da ko‘rinmaydi
+        type: string
+      status:
+        description: '"active", "deleted"'
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/admp/login:
+    post:
+      consumes:
+      - application/json
+      description: login a system user
+      parameters:
+      - description: SysUser object to Login
+        in: body
+        name: sysuser
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully LogedIn
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Login a sysuser
+      tags:
+      - admp
+  /api/all/check:
+    post:
+      consumes:
+      - application/json
+      description: Checks if the user email is already registered and sends OTP if
+        not
+      parameters:
+      - description: Email to check
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.Check_User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CheckExists'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Check if user exists
+      tags:
+      - user
+  /api/all/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user with email and password
+      parameters:
+      - description: User login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: User login
+      tags:
+      - user
+  /api/all/singup:
+    post:
+      consumes:
+      - application/json
+      description: Completes registration using OTP
+      parameters:
+      - description: User signup data with OTP
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserCreReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Sign up a new user
+      tags:
+      - user
+  /api/all/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch a user using their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get user by ID
+      tags:
+      - all
+  /api/super/sysuser:
+    get:
+      consumes:
+      - application/json
+      description: Only accessible by superadmin
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SysUser'
+      security:
+      - BearerAuth: []
+      summary: Get all system users
+      tags:
+      - sysusers
+  /api/super/sysuser_create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new system user (admin, buxgalter, etc.) with role assignment
+      parameters:
+      - description: SysUser object to create
+        in: body
+        name: sysuser
+        required: true
+        schema:
+          $ref: '#/definitions/models.SysUserCretReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/models.SysUserCreateResp'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "409":
+          description: SysUser already exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Create a new sysuser
+      tags:
+      - sysusers
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
